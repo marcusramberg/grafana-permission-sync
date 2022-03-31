@@ -4,14 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"regexp"
 	"strings"
 
 	"go.uber.org/zap"
-	"golang.org/x/oauth2/google"
 	admin "google.golang.org/api/admin/directory/v1"
-	"google.golang.org/api/option"
 )
 
 // GroupTree is the service that deals with google groups
@@ -88,25 +85,10 @@ func (g *Group) AllUsers() []*User {
 }
 
 // CreateGroupTree -
-func CreateGroupTree(logger *zap.SugaredLogger, domain string, userEmail string, serviceAccountFilePath string, groupBlacklist []string, scopes ...string) (*GroupTree, error) {
+func CreateGroupTree(logger *zap.SugaredLogger, domain string, groupBlacklist []string, scopes ...string) (*GroupTree, error) {
 	ctx := context.Background()
-	log := logger
 
-	log.Infow("loading creds", "path", serviceAccountFilePath)
-	jsonCredentials, err := ioutil.ReadFile(serviceAccountFilePath)
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := google.JWTConfigFromJSON(jsonCredentials, scopes...)
-	if err != nil {
-		return nil, fmt.Errorf("JWTConfigFromJSON: %v", err)
-	}
-	config.Subject = userEmail
-
-	ts := config.TokenSource(ctx)
-
-	svc, err := admin.NewService(ctx, option.WithTokenSource(ts))
+	svc, err := admin.NewService(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("NewService: %v", err)
 	}

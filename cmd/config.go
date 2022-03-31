@@ -11,8 +11,6 @@ import (
 
 // GoogleConfig -
 type GoogleConfig struct {
-	CredentialsPath string   `yaml:"credentialsPath"`
-	AdminEmail      string   `yaml:"adminEmail"`
 	Domain          string   `yaml:"domain"`
 	GroupBlacklist  []string `yaml:"groupBlacklist"`
 }
